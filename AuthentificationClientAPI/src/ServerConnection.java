@@ -8,6 +8,7 @@ import java.util.UUID;
 import exceptions.AuthentificationFailedException;
 import exceptions.NotLoggedAsAServerException;
 import messages.Message;
+import messages.error.ErrorCodes;
 import messages.login.LoginAnswer;
 import messages.login.LoginRequest;
 import messages.refresh.RefreshEndOfCom;
@@ -71,7 +72,7 @@ public class ServerConnection {
 			}
 		}
 		if (token == null)
-			throw new AuthentificationFailedException();
+			throw new AuthentificationFailedException(ErrorCodes.BAD_USR_OR_PWD_txt);
 		return token;
 	}
 	
@@ -91,10 +92,14 @@ public class ServerConnection {
 			
 			if (message.getAnswer().equals(AnswerType.SUCCES)) {
 				return;
+			} else if (message.getAnswer().equals(AnswerType.BAD_INFOS)) {
+				refreshSocket.close();
+				refreshSocket = null;
+				throw new AuthentificationFailedException(ErrorCodes.BAD_USR_OR_PWD_txt);
 			} else {
 				refreshSocket.close();
 				refreshSocket = null;
-				throw new AuthentificationFailedException();
+				throw new AuthentificationFailedException(ErrorCodes.NOT_A_SERVER_txt);
 			}
 			
 			
