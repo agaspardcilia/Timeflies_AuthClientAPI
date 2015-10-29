@@ -25,18 +25,35 @@ import utils.Sha1;
 * ServerConnection.java
 */
 public class ServerConnection {
+	//Message sending attempts.
 	public final static int RETRY = 5;
 	
+	//Server's info
 	private String addr;
 	private int port;
 	
+	//Client's info
 	private String username;
 	private String pwd;
 	
+	//Socket and streams
 	private Socket refreshSocket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	
+	/**
+	 * Collects data to connect to the authentication server.
+	 * @param addr
+	 * 	Server's address.
+	 * @param port
+	 * 	Server's port.
+	 * @param username
+	 * 	Username
+	 * @param pwd
+	 * 	Password
+	 * @param useSha1
+	 * 	Do you wan't to let ServerConnection hash the password ? 
+	 */
 	public ServerConnection(String addr, int port, String username, String pwd, boolean useSha1) {
 			this.addr = addr;
 			this.port = port;
@@ -77,6 +94,11 @@ public class ServerConnection {
 	}
 	
 	
+	/**
+	 * Connects an user.
+	 * @throws AuthentificationFailedException
+	 * 	Thrown when something wen't wrong.
+	 */
 	public void connectAsServer() throws AuthentificationFailedException {
 		ServerLoginAnswer message;
 		
@@ -112,6 +134,17 @@ public class ServerConnection {
 	
 	//TODO handle communication errors.
 	//TODO include client InetAddress
+	/**
+	 * If you are connected as a server, this method will refresh a token. By that i mean test if the token
+	 * is still valid (not out dated and with the right InetAddress).
+	 * @param token
+	 * 	Token to refresh.
+	 * @return
+	 * 	True = the token has been refreshed. False = the token is not valid. 
+	 * @throws NotLoggedAsAServerException
+	 * 	Thrown if you try to use this method without been connected as a server. It could mean that you forgot to use
+	 * the method connectAsServer().
+	 */
 	public boolean refreshToken(UUID token) throws NotLoggedAsAServerException {
 		if(refreshSocket == null) {
 			System.err.println("You must be logged as a server to do that.");
